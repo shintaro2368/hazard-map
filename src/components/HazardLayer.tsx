@@ -3,13 +3,17 @@ import { TileLayer } from "leaflet";
 import { useMap } from "react-leaflet";
 import { hazardUrlAtom } from "../lib/global-state";
 
+/**
+ * 主要災害レイヤーの切り替えを行う
+ * @returns
+ */
 export default function HazardLayer() {
   const map = useMap();
   const hazardUrlValue = useAtomValue(hazardUrlAtom);
 
   map.eachLayer((el) => {
     if (el instanceof TileLayer) {
-      const tl = el as TileLayer;
+      const tl: TileLayer = el;
       if (tl.options.id === "hazardLayer") {
         map.removeLayer(el);
       }

@@ -4,6 +4,10 @@ import { LS_ADDRESSES, SEARCH_API } from "../lib/constants";
 import { addressesAtom, currentCenterAtom } from "../lib/global-state";
 import { AddressSearchResult, Area, AreaForm } from "../types";
 
+/**
+ * エリア作成を行う
+ * @returns
+ */
 export default function AddressSearch() {
   const initialAreaForm: AreaForm = {
     address: "",

@@ -44,7 +44,14 @@ function App() {
 
     const addressesStr = localStorage.getItem(LS_ADDRESSES);
     if (addressesStr) {
-      setAddresses(JSON.parse(addressesStr));
+      try {
+        setAddresses(JSON.parse(addressesStr));
+      } catch (e) {
+        console.error(e);
+        alert(
+          "エリアの読み込みに失敗しました。ローカルストレージをクリアしてください。"
+        );
+      }
     }
   }, []);
 

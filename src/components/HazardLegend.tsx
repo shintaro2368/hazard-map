@@ -6,6 +6,10 @@ import {
 } from "../lib/constants";
 import { hazardUrlAtom } from "../lib/global-state";
 
+/**
+ * 主要災害レイヤーの凡例を表示する
+ * @returns
+ */
 export default function HazardLegend() {
   const hazardUrlValue = useAtomValue(hazardUrlAtom);
 

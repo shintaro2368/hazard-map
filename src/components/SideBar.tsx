@@ -19,6 +19,10 @@ import {
 import { Area } from "../types";
 import AddressSearch from "./AddressSearch";
 
+/**
+ * 地図やレイヤーの切り替え、エリアの管理を行うサイドバー
+ * @returns
+ */
 export default function SideBar() {
   const addressesValue = useAtomValue(addressesAtom);
   const setAddresses = useSetAtom(addressesAtom);
@@ -27,7 +31,10 @@ export default function SideBar() {
   const setCurrentCenter = useSetAtom(currentCenterAtom);
   const currentCenterValue = useAtomValue(currentCenterAtom);
 
+  // 地図種別
   const mapTypes: MapInfo[] = [BASE_MAP, OVERE_VIEW_MAP, WHITE_MAP];
+
+  // 主要災害レイヤー種別
   const hazardTypes: MapInfo[] = [
     { NAME: "指定なし", TILE_URL: "" },
     HAZARD_KOZUI,
@@ -36,6 +43,11 @@ export default function SideBar() {
     HAZARD_NAISUI,
   ];
 
+  /**
+   * IDからエリアをローカルストレージから削除する
+   * @param id エリアID
+   * @returns
+   */
   function handleDelete(id: string) {
     try {
       const addressesStr = localStorage.getItem(LS_ADDRESSES);
