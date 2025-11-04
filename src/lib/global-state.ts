@@ -1,6 +1,6 @@
 import { atom } from "jotai";
+import { Area, CurrentCenter } from "../types";
 import { BASE_MAP } from "./constants";
-import { Area, CurrentCenter } from "./types";
 
 export const currentCenterAtom = atom<CurrentCenter>({
   lat: 36,

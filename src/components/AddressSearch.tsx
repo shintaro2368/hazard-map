@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { useState } from "react";
 import { LS_ADDRESSES, SEARCH_API } from "../lib/constants";
 import { addressesAtom, currentCenterAtom } from "../lib/global-state";
-import { AddressSearchResult, Area, AreaForm } from "../lib/types";
+import { AddressSearchResult, Area, AreaForm } from "../types";
 
 export default function AddressSearch() {
   const initialAreaForm: AreaForm = {

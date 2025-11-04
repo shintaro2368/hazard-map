@@ -16,7 +16,7 @@ import {
   hazardUrlAtom,
   mapUrlAtom,
 } from "../lib/global-state";
-import { Area } from "../lib/types";
+import { Area } from "../types";
 import AddressSearch from "./AddressSearch";
 
 export default function SideBar() {
