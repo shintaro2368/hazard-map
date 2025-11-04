@@ -2,58 +2,86 @@ import { useSetAtom } from "jotai";
 import { useState } from "react";
 import { LS_ADDRESSES, SEARCH_API } from "../lib/constants";
 import { addressesAtom, currentCenterAtom } from "../lib/global-state";
+import { AddressSearchResult, Area, AreaForm } from "../lib/types";
 
 export default function AddressSearch() {
-  const [address, setAddress] = useState("");
-  const [areaName, setAreaName] = useState("");
+  const initialAreaForm: AreaForm = {
+    address: "",
+    name: "",
+  };
+  const [areaForm, setAreaForm] = useState<AreaForm>(initialAreaForm);
+
+  // ジオコーディングを取得中かの判定
   const [isSeach, setIsSearch] = useState(false);
+
+  // エリア名入力ダイアログを表示するかの判定
   const [showDialog, setShowDialog] = useState(false);
 
   const setAddresses = useSetAtom(addressesAtom);
   const setCurrentCenter = useSetAtom(currentCenterAtom);
 
-  async function handleSearch() {
+  /**
+   * 国土地理院ジオコーディングAPIを呼び出して、返却された緯度経度とエリア名を紐づけて保存する
+   */
+  async function handleSearchAndSave() {
     setIsSearch(true);
     try {
-      const res = await fetch(`${SEARCH_API}${address}`);
-      const json = await res.json();
+      const res = await fetch(`${SEARCH_API}${areaForm.address}`);
 
-      if (json?.length > 0) {
-        const pos = json[0]["geometry"]["coordinates"];
-        const newAddress = {
-          id: new Date().getTime(),
-          name: areaName,
-          lat: pos[1] as number,
-          lng: pos[0] as number,
-        };
+      if (!res.ok) {
+        throw new Error(`Http error was occurred with stats ${res.status}.`);
+      }
+      const data: AddressSearchResult = await res.json();
 
-        const addressStr = localStorage.getItem(LS_ADDRESSES);
-        if (addressStr) {
-          const address = JSON.parse(addressStr) as any[];
-          address.push(newAddress);
-          localStorage.setItem(LS_ADDRESSES, JSON.stringify(address));
-        } else {
-          localStorage.setItem(LS_ADDRESSES, JSON.stringify([newAddress]));
-        }
-
-        setAddresses((prev) => [...prev, newAddress]);
-        setCurrentCenter({
-          id: newAddress.id,
-          lat: newAddress.lat,
-          lng: newAddress.lng,
-        });
-      } else {
+      // ヒットしなければ空配列である
+      if (data.length === 0) {
         alert(
           "住所から緯度経度を検索することができませんでした。\n入力内容をご確認ください。"
         );
+      } // 住所が抽象的であれば複数件ヒットすることがある
+      else if (data.length >= 2) {
+        alert(
+          "複数件の住所が候補としてあります。\n特定が可能な住所を具体的に入力してください。"
+        );
+      } else {
+        const coordinates = data[0].geometry.coordinates;
+        const newArea: Area = {
+          id: crypto.randomUUID(),
+          name: areaForm.name,
+          lat: coordinates[1],
+          lng: coordinates[0],
+        };
+
+        const addressFromLS = localStorage.getItem(LS_ADDRESSES);
+        const areas: Area[] = [];
+        try {
+          if (addressFromLS) {
+            areas.push(JSON.parse(addressFromLS));
+          }
+          areas.push(newArea);
+          localStorage.setItem(LS_ADDRESSES, JSON.stringify(areas));
+        } catch (e) {
+          console.error(e);
+          alert(
+            "エリアの保存に失敗しました。\nローカルストレージをクリアしてください。"
+          );
+          return;
+        }
+
+        setAddresses((prev) => [...prev, newArea]);
+        setCurrentCenter({
+          id: newArea.id,
+          lat: newArea.lat,
+          lng: newArea.lng,
+        });
       }
     } catch (e) {
-      alert("ジオコーディングに失敗しました。");
+      console.error(e);
+      alert("エリア作成に失敗しました");
     } finally {
       setIsSearch(false);
       setShowDialog(false);
-      setAddress("");
-      setAreaName("");
+      setAreaForm(initialAreaForm);
     }
   }
 
@@ -64,8 +92,10 @@ export default function AddressSearch() {
           className="form-control me-2"
           type="text"
           required
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
+          value={areaForm.address}
+          onChange={(e) =>
+            setAreaForm((prev) => ({ ...prev, address: e.target.value }))
+          }
           placeholder="住所を入力"
         />
         <button
@@ -86,7 +116,7 @@ export default function AddressSearch() {
                   type="button"
                   className="btn-close"
                   onClick={() => {
-                    setAreaName("");
+                    setAreaForm(initialAreaForm);
                     setShowDialog(false);
                   }}
                 ></button>
@@ -96,8 +126,10 @@ export default function AddressSearch() {
                 <input
                   type="text"
                   className="form-control"
-                  value={areaName}
-                  onChange={(e) => setAreaName(e.target.value)}
+                  value={areaForm.name}
+                  onChange={(e) =>
+                    setAreaForm((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   ref={(ie) => ie?.focus()}
                 />
               </div>
@@ -106,7 +138,7 @@ export default function AddressSearch() {
                   type="button"
                   className="btn btn-secondary"
                   onClick={() => {
-                    setAreaName("");
+                    setAreaForm(initialAreaForm);
                     setShowDialog(false);
                   }}
                 >
@@ -115,7 +147,7 @@ export default function AddressSearch() {
                 <button
                   type="button"
                   className={`btn btn-primary ${isSeach ? "disabled" : ""}`}
-                  onClick={() => handleSearch()}
+                  onClick={() => handleSearchAndSave()}
                 >
                   保存
                 </button>

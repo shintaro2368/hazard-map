@@ -16,6 +16,7 @@ import {
   hazardUrlAtom,
   mapUrlAtom,
 } from "../lib/global-state";
+import { Area } from "../lib/types";
 import AddressSearch from "./AddressSearch";
 
 export default function SideBar() {
@@ -35,18 +36,24 @@ export default function SideBar() {
     HAZARD_NAISUI,
   ];
 
-  function handleDelete(id: number) {
+  function handleDelete(id: string) {
     try {
       const addressesStr = localStorage.getItem(LS_ADDRESSES);
-      if (!addressesStr) return;
+      if (!addressesStr) {
+        alert("ローカルストレージにデータがありません。");
+        return;
+      }
 
-      const addresses = JSON.parse(addressesStr) as any[];
+      const addresses: Area[] = JSON.parse(addressesStr);
       const removed = addresses.filter((address) => address.id !== id);
       localStorage.setItem(LS_ADDRESSES, JSON.stringify(removed));
 
       setAddresses(removed);
     } catch (e) {
-      alert("エリアの削除が失敗しました。");
+      console.error(e);
+      alert(
+        "エリアの削除が失敗しました。ローカルストレージをクリアしてください。"
+      );
     }
   }
 
