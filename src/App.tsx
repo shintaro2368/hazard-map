@@ -9,7 +9,7 @@ import HazardLayer from "./components/HazardLayer";
 import HazardLegend from "./components/HazardLegend";
 import MapLalyer from "./components/MapLayer";
 import SideBar from "./components/SideBar";
-import { LS_ADDRESSES } from "./lib/constants";
+import { CURRENT_POSITION_OPTIONS, LS_ADDRESSES } from "./lib/constants";
 import { addressesAtom, currentCenterAtom } from "./lib/global-state";
 
 function App() {
@@ -75,7 +75,7 @@ function App() {
         <Marker
           position={currentPosition}
           title="現在地"
-          icon={icon({ iconUrl: "./person.png", iconSize: [36, 36] })}
+          icon={icon(CURRENT_POSITION_OPTIONS)}
         >
           <Popup>現在地</Popup>
         </Marker>

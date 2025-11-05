@@ -73,3 +73,17 @@ export type CurrentCenter = {
    */
   lng: number;
 };
+
+/**
+ * 地図
+ */
+export type MapInfo = {
+  /**
+   * 地図の名称
+   */
+  NAME: string;
+  /**
+   * 地図（マップ）タイルのURL
+   */
+  TILE_URL: string;
+};

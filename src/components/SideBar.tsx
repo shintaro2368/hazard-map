@@ -6,7 +6,6 @@ import {
   HAZARD_TAKASHIO,
   HAZARD_THUNAMI,
   LS_ADDRESSES,
-  MapInfo,
   OVERE_VIEW_MAP,
   WHITE_MAP,
 } from "../lib/constants";
@@ -16,7 +15,7 @@ import {
   hazardUrlAtom,
   mapUrlAtom,
 } from "../lib/global-state";
-import { Area } from "../types";
+import { Area, MapInfo } from "../types";
 import AddressSearch from "./AddressSearch";
 
 /**
