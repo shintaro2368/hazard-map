@@ -6,7 +6,6 @@ import {
   HAZARD_TAKASHIO,
   HAZARD_THUNAMI,
   LS_ADDRESSES,
-  MapInfo,
   OVERE_VIEW_MAP,
   WHITE_MAP,
 } from "../lib/constants";
@@ -16,8 +15,13 @@ import {
   hazardUrlAtom,
   mapUrlAtom,
 } from "../lib/global-state";
+import { Area, MapInfo } from "../types";
 import AddressSearch from "./AddressSearch";
 
+/**
+ * 地図やレイヤーの切り替え、エリアの管理を行うサイドバー
+ * @returns
+ */
 export default function SideBar() {
   const addressesValue = useAtomValue(addressesAtom);
   const setAddresses = useSetAtom(addressesAtom);
@@ -26,7 +30,10 @@ export default function SideBar() {
   const setCurrentCenter = useSetAtom(currentCenterAtom);
   const currentCenterValue = useAtomValue(currentCenterAtom);
 
+  // 地図種別
   const mapTypes: MapInfo[] = [BASE_MAP, OVERE_VIEW_MAP, WHITE_MAP];
+
+  // 主要災害レイヤー種別
   const hazardTypes: MapInfo[] = [
     { NAME: "指定なし", TILE_URL: "" },
     HAZARD_KOZUI,
@@ -35,18 +42,29 @@ export default function SideBar() {
     HAZARD_NAISUI,
   ];
 
-  function handleDelete(id: number) {
+  /**
+   * IDからエリアをローカルストレージから削除する
+   * @param id エリアID
+   * @returns
+   */
+  function handleDelete(id: string) {
     try {
       const addressesStr = localStorage.getItem(LS_ADDRESSES);
-      if (!addressesStr) return;
+      if (!addressesStr) {
+        alert("ローカルストレージにデータがありません。");
+        return;
+      }
 
-      const addresses = JSON.parse(addressesStr) as any[];
+      const addresses: Area[] = JSON.parse(addressesStr);
       const removed = addresses.filter((address) => address.id !== id);
       localStorage.setItem(LS_ADDRESSES, JSON.stringify(removed));
 
       setAddresses(removed);
     } catch (e) {
-      alert("エリアの削除が失敗しました。");
+      console.error(e);
+      alert(
+        "エリアの削除が失敗しました。ローカルストレージをクリアしてください。"
+      );
     }
   }
 
