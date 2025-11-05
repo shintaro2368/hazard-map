@@ -28,6 +28,11 @@ export default function AddressSearch() {
    * 国土地理院ジオコーディングAPIを呼び出して、返却された緯度経度とエリア名を紐づけて保存する
    */
   async function handleSearchAndSave() {
+    if (!(areaForm.name && areaForm.name.trim().length > 0)) {
+      alert("エリア名を入力してください。");
+      return;
+    }
+    
     setIsSearch(true);
     try {
       const res = await fetch(`${SEARCH_API}${areaForm.address}`);
@@ -89,6 +94,14 @@ export default function AddressSearch() {
     }
   }
 
+  function handleShowAreaDailog() {
+    if (areaForm.address && areaForm.address.trim().length > 0) {
+      setShowDialog(true);
+    } else {
+      alert("住所を入力してください。");
+    }
+  }
+
   return (
     <>
       <div className="d-flex m-2">
@@ -104,7 +117,7 @@ export default function AddressSearch() {
         />
         <button
           className={`w-25 btn btn-primary ${isSeach ? "disabled" : ""}`}
-          onClick={() => setShowDialog(true)}
+          onClick={handleShowAreaDailog}
         >
           追加
         </button>
